@@ -1,0 +1,3 @@
+void game() {
+  background(green);
+}
