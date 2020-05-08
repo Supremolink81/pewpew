@@ -1,3 +1,6 @@
+ArrayList<GameObject> objects;
+Player myPlayer;
+
 //color pallette
 color black  = #000000;
 color white  = #FFFFFF;
@@ -12,7 +15,7 @@ final int INTRO    = 0;
 final int GAME     = 1;
 final int PAUSE    = 2;
 final int GAMEOVER = 3;
-int mode = INTRO;
+int mode = GAME;
 
 //key variables;
 boolean wkey, akey, skey, dkey, spacekey;
@@ -28,17 +31,20 @@ void setup() {
   noStroke();
   
   //initialize key variables
-  wkey = akey = skey = dkey = spacekey = false;
+  myPlayer = new Player();
+  objects = new ArrayList<GameObject>();
+  objects.add(myPlayer);
 }
 
 //##################################### DRAW ################################################
 
 void draw() {
+  println(objects.size());
   if      (mode == INTRO)    intro();
   else if (mode == GAME)     game();
   else if (mode == PAUSE)    pause();
   else if (mode == GAMEOVER) gameOver();
-  else println("Mode error! You need to add a new mode to your mode framework in the draw function! -- Mr. Pelletier");
+  else println("Mode error!");
 }
 
 //Clicking Functions
@@ -78,4 +84,96 @@ void keyReleased() {
   if (key == 's' || key == 'S') skey = false;
   if (key == 'd' || key == 'D') dkey = false;
   if (key == 'd' || key == 'D') spacekey = false;
+}
+
+//GAMEOBJECT CLASS
+
+class GameObject {
+  
+  float x, y, vx, vy, size, hp;
+  
+  color myColor;
+  
+  GameObject(color c) {
+    x = random(0, width);
+    y = random(0, height);
+    vx = 0;
+    vy = 0;
+    size = random(20, 100);
+    hp = 1;
+    myColor = c;
+  }
+  
+  GameObject(float x, float y, float size, float hp, color c) {
+    this.x = x;
+    this.y = y;
+    this.size = size;
+    this.hp = hp;
+    this.myColor = c;
+    vx = 0;
+    vy = 0;
+  }
+  
+  void act() {
+    x = x + vx;
+    y = y + vy;
+  }
+  
+  void show() {
+    fill(myColor);
+    ellipse(x, y, size, size);
+  }
+  
+  boolean isDead() {
+    if (hp <= 0) return true;
+    else return false;
+  }
+  
+}
+
+//PLAYER
+
+class Player extends GameObject {
+  
+  Player() {
+    super(width/2, height/2, 20, 1, yellow);
+  }
+  
+  
+  void act() {
+    super.act();
+    if (wkey) vy = -4;
+    else if (akey) vx = -4;
+    else if (skey) vy = 4;
+    else if (dkey) vx = 4;
+    if (!wkey && !skey) vy = 0;
+    if (!akey && !dkey) vx = 0;
+    if (x < 0) x = 0;
+    if (x > width) x = width;
+    if (x < 0) y = 0;
+    if (y > height) y = height;
+    shoot();
+  }
+  
+  void shoot() {
+    if (mousePressed) {
+      objects.add(new Bullet());
+    }
+  }
+  
+}
+
+class Bullet extends GameObject {
+  
+  Bullet() {
+    super(myPlayer.x, myPlayer.y, 5, 1, yellow);
+    vx = 0;
+    vy = -10;
+  }
+  
+  void act() {
+    super.act();
+    if (x < 0 || x > width || y < 0 || y > height) hp = 0;
+  }
+  
 }
