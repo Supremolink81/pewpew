@@ -1,5 +1,6 @@
 void game() {
   background(green);
+  noStroke();
   
   int i = 0;
   while (i <objects.size()) {
@@ -12,4 +13,16 @@ void game() {
       i++;
     }
   }
+  
+  if (frameCount % 60 == 0) {
+    objects.add(new Enemy());
+  }
+  
+  fill(0);
+  stroke(255);
+  rect(width/7, height/1.1, 150, 60);
+  
+  fill(pink);
+  textSize(50);
+  text("Back", width/7, height/1.1);
 }
